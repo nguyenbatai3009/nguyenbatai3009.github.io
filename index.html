@@ -178,8 +178,7 @@
                     </table>
                 </div>
             </div>
-            <div class="ip-info">
-                IP của thiết bị: <span id="ip-address">Đang lấy IP...</span>
+           
             </div>
         </div>
     </div>
@@ -214,16 +213,7 @@
             location.reload();
         }
 
-        function fetchIPAddress() {
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('ip-address').textContent = data.ip;
-                })
-                .catch(error => {
-                    document.getElementById('ip-address').textContent = 'Không thể lấy IP';
-                });
-        }
+      
 
         window.onload = fetchIPAddress;
     </script>
