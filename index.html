@@ -1,1 +1,231 @@
-<!doctype html><html lang=""><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><title>my-project</title><script defer="defer" src="/js/chunk-vendors.922a4ae0.js"></script><script defer="defer" src="/js/app.f9361a53.js"></script><link href="/css/app.e3b56a8d.css" rel="stylesheet"></head><body><noscript><strong>We're sorry but my-project doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript><div id="app"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOBA Map Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 1500px;
+        }
+        .map {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            background-color: #e0e0e0; /* Bạn có thể thay đổi hoặc xóa dòng này khi thêm ảnh của bạn */
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .map img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+        .map-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+        .controls button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .controls input[type="range"] {
+            width: 300px;
+        }
+        .settings {
+            padding: 20px;
+            width: 100%;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .settings h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .settings label {
+            display: block;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .settings input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .hero-info {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .hero-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .hero-info th, .hero-info td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .ip-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+            .map {
+                height: 800px;
+                margin-right: 20px;
+                border-bottom: none;
+                border-right: 1px solid #ccc;
+                margin-bottom: 0;
+            }
+            .right-panel {
+                width: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="map" id="map">
+            <!-- Bạn có thể thêm hình ảnh của mình vào đây -->
+            <!-- Ví dụ: <img src="path_to_your_image.jpg" alt="Map Image" style="width: 100%; height: 100%; object-fit: cover;"> -->
+        </div>
+        <div class="right-panel">
+            <div class="map-title">Map View</div>
+            <div class="controls">
+                <button onclick="zoomOut()">-</button>
+                <input type="range" id="zoomSlider" min="0" max="200" value="100" oninput="updateZoom()">
+                <button onclick="zoomIn()">+</button>
+                <button onclick="reloadPage()">↻</button>
+            </div>
+            <button onclick="resetZoom()">Reset Zoom</button>
+            <div class="settings">
+                <h2>Settings</h2>
+                <label><input type="checkbox" checked> Show HP Bar</label>
+                <label><input type="checkbox" checked> Show Hero Images</label>
+                <label><input type="checkbox"> Show Number ID</label>
+                <label><input type="checkbox"> Red Team</label>
+                <label><input type="checkbox"> Show Info Only Enemy</label>
+                <label><input type="checkbox"> Show Hero Names</label>
+                <label>Circle Size: <input type="range" min="1" max="100" value="50"></label>
+                <div class="hero-info">
+                    <h2>Hero Info</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hero</th>
+                                <th>CD 1</th>
+                                <th>CD 2</th>
+                                <th>CD 3</th>
+                                <th>HP</th>
+                                <th>Talent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hero-info-body">
+                            <!-- Thông tin hero sẽ được lấy tự động -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ip-info">
+                IP của thiết bị: <span id="ip-address">Đang lấy IP...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const map = document.getElementById('map');
+        const zoomSlider = document.getElementById('zoomSlider');
+
+        function zoomIn() {
+            const newValue = Math.min(200, parseInt(zoomSlider.value) + 10);
+            zoomSlider.value = newValue;
+            updateZoom();
+        }
+
+        function zoomOut() {
+            const newValue = Math.max(0, parseInt(zoomSlider.value) - 10);
+            zoomSlider.value = newValue;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const zoomValue = zoomSlider.value;
+            map.style.transform = `scale(${zoomValue / 100})`;
+        }
+
+        function resetZoom() {
+            zoomSlider.value = 100;
+            updateZoom();
+        }
+
+        function reloadPage() {
+            location.reload();
+        }
+
+        function fetchIPAddress() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ip-address').textContent = data.ip;
+                })
+                .catch(error => {
+                    document.getElementById('ip-address').textContent = 'Không thể lấy IP';
+                });
+        }
+
+        window.onload = fetchIPAddress;
+    </script>
+</body>
+</html>
